@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
     
-    <parent>
-        <groupId>org.lorislab.treasure</groupId>
-        <artifactId>treasure</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+	<parent>
+		<groupId>org.lorislab.treasure</groupId>
+		<artifactId>treasure</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../</relativePath>
-    </parent>
+	</parent>
 	
-    <artifactId>treasure-jboss-login-module</artifactId> 
-    <name>treasure-jboss-login-module</name>
+	<artifactId>treasure-jboss-login-module</artifactId> 
+	<name>treasure-jboss-login-module</name>
 	
 	<dependencies>
 		<dependency>
@@ -17,29 +17,11 @@
 			<artifactId>treasure-lib</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.picketbox</groupId>
+			<artifactId>picketbox</artifactId>
+			<scope>provided</scope>
+		</dependency>		
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<artifactSet>
-								<includes>
-									<include>org.lorislab.treasure:treasure-lib</include>
-								</includes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>	
+			
 </project>

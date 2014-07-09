@@ -42,7 +42,12 @@
 	<!-- Dependency management -->
 	<dependencyManagement>
 		<dependencies>
-
+			<dependency>
+				<groupId>org.picketbox</groupId>
+				<artifactId>picketbox</artifactId>
+				<version>4.0.19.Final</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
