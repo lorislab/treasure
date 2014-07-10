@@ -13,41 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.lorislab.treasure.service;
 
+import org.lorislab.treasure.model.CipherKey;
 import org.lorislab.treasure.model.PasswordKey;
 
 /**
  * The format service.
- * 
+ *
  * @author Andrej Petras
  */
 public final class FormatService {
-    
+
     /**
      * The default constructor.
-     */    
+     */
     private FormatService() {
         //  empty constructor.
     }
-    
+
     /**
      * The secret password separator.
      */
     private static final String SEPARATOR = ":";
-    
+
     /**
      * Converts the password key to secret password.
      *
      * @param passwordKey the password key.
      * @return the secret password.
      */
-    public static String convertPasswordKeyToString(final PasswordKey passwordKey) {
+    public static String convertToString(final PasswordKey passwordKey) {
         StringBuilder sb = new StringBuilder();
-        sb.append(ConverterService.bytesToHexString(passwordKey.getSalt()));
+        sb.append(passwordKey.getIterations());        
         sb.append(SEPARATOR);
-        sb.append(passwordKey.getIterations());
+        sb.append(ConverterService.bytesToHexString(passwordKey.getSalt()));
         sb.append(SEPARATOR);
         sb.append(ConverterService.bytesToHexString(passwordKey.getKey()));
         return sb.toString();
@@ -61,9 +61,42 @@ public final class FormatService {
      */
     public static PasswordKey convertToPasswordKey(final String secretPassword) {
         String[] tmp = secretPassword.split(SEPARATOR);
-        byte[] salt = ConverterService.hexStringToBytes(tmp[0]);
-        int iterations = Integer.parseInt(tmp[1]);
+        int iterations = Integer.parseInt(tmp[0]);
+        byte[] salt = ConverterService.hexStringToBytes(tmp[1]);        
         byte[] key = ConverterService.hexStringToBytes(tmp[2]);
         return new PasswordKey(iterations, salt, key);
-    }    
+    }
+
+    /**
+     * Converts the hash to the cipher key.
+     *
+     * @param hash the hash string.
+     * @return the corresponding cipher key.
+     */
+    public static CipherKey convertToCipherKey(String hash) {
+        String[] tmp = hash.split(SEPARATOR);
+        int iterations = Integer.parseInt(tmp[0]);
+        byte[] iv = ConverterService.hexStringToBytes(tmp[1]);
+        byte[] salt = ConverterService.hexStringToBytes(tmp[2]);
+        byte[] cipherText = ConverterService.hexStringToBytes(tmp[3]);
+        return new CipherKey(iv, cipherText, salt, iterations);
+    }
+
+    /**
+     * Converts the cipher key to the hash string.
+     *
+     * @param key the cipher key.
+     * @return the corresponding the hash key.
+     */
+    public static String convertToString(final CipherKey key) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(key.getIterations());
+        sb.append(SEPARATOR);
+        sb.append(ConverterService.bytesToHexString(key.getIv()));
+        sb.append(SEPARATOR);
+        sb.append(ConverterService.bytesToHexString(key.getSalt()));
+        sb.append(SEPARATOR);
+        sb.append(ConverterService.bytesToHexString(key.getCipherText()));
+        return sb.toString();
+    }
 }

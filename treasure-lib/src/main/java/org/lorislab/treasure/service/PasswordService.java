@@ -15,13 +15,19 @@
  */
 package org.lorislab.treasure.service;
 
+import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import org.lorislab.treasure.model.CipherKey;
 import org.lorislab.treasure.model.PasswordKey;
 
 /**
@@ -37,6 +43,16 @@ public class PasswordService {
     private static final String ALGORITHM = "PBKDF2WithHmacSHA1";
 
     /**
+     * The cipher algorithm.
+     */
+    private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
+
+    /**
+     * The key spec.
+     */
+    private static final String KEY_SPEC = "AES";
+
+    /**
      * The random algorithm.
      */
     private static final String RANDOM_ALGORITHM = "SHA1PRNG";
@@ -49,7 +65,66 @@ public class PasswordService {
     /**
      * The derived key length;
      */
-    private static final int DERIVED_KEY_LENGTH = 160;
+    private static final int DERIVED_KEY_LENGTH = 128;
+
+    /**
+     * The char set name.
+     */
+    private static final String CHARSET_NAME = "UTF-8";
+
+    /**
+     * Encrypts the data with the password.
+     *
+     * @param data the data.
+     * @param password the password.
+     * @return the corresponding the data.
+     * @throws Exception if the method fails.
+     */
+    public static String encrypt(String data, char[] password) throws Exception {
+
+        // create salt
+        SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
+        byte[] salt = new byte[8];
+        random.nextBytes(salt);
+
+        /* Derive the key, given password and salt. */
+        SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+        KeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, DERIVED_KEY_LENGTH);
+        SecretKey tmp = factory.generateSecret(spec);
+        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), KEY_SPEC);
+
+        /* Encrypt the message. */
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, secret);
+        AlgorithmParameters params = cipher.getParameters();
+
+        byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+        byte[] ciphertext = cipher.doFinal(data.getBytes(CHARSET_NAME));
+        CipherKey key = new CipherKey(iv, ciphertext, salt, ITERATIONS);
+
+        return FormatService.convertToString(key);
+    }
+
+    /**
+     * Decrypts the data with password.
+     *
+     * @param data the data.
+     * @param password the password.
+     * @return the corresponding string.
+     * @throws Exception if the method fails.
+     */
+    public static String decrypt(String data, char[] password) throws Exception {
+        CipherKey key = FormatService.convertToCipherKey(data);
+
+        SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+        KeySpec spec = new PBEKeySpec(password, key.getSalt(), key.getIterations(), DERIVED_KEY_LENGTH);
+        SecretKey tmp = factory.generateSecret(spec);
+        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), KEY_SPEC);
+
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(key.getIv()));
+        return new String(cipher.doFinal(key.getCipherText()), CHARSET_NAME);
+    }
 
     /**
      * Creates the secret password.
@@ -72,7 +147,7 @@ public class PasswordService {
                 byte[] data = createKey(password, salt, ITERATIONS);
                 PasswordKey tmp = new PasswordKey(ITERATIONS, salt, data);
 
-                return FormatService.convertPasswordKeyToString(tmp);
+                return FormatService.convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error create secret password.", ex);
             }
@@ -106,7 +181,7 @@ public class PasswordService {
             try {
                 byte[] key = createKey(newPassword, pk.getSalt(), pk.getIterations());
                 PasswordKey tmp = new PasswordKey(pk.getIterations(), pk.getSalt(), key);
-                result = FormatService.convertPasswordKeyToString(tmp);
+                result = FormatService.convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error update secret password", ex);
             }
