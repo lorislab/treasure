@@ -133,7 +133,7 @@ public class PasswordService {
      * @return the corresponding secret password.
      * @throws Exception if the method fails.
      */
-    public static String createSecretPassword(final String password) throws Exception {
+    public static String createSecretPassword(final char[] password) throws Exception {
         String result = null;
 
         if (password != null) {
@@ -165,7 +165,7 @@ public class PasswordService {
      * @return the corresponding secret password.
      * @throws Exception if the method fails.
      */
-    public static String updateSecretPassword(final String password, final String newPassword, final String secretPassword) throws Exception {
+    public static String updateSecretPassword(final char[] password, final char[] newPassword, final String secretPassword) throws Exception {
         String result = null;
 
         if (password == null && secretPassword == null) {
@@ -198,7 +198,7 @@ public class PasswordService {
      * @return returns {@code true} if the password are equals.
      * @throws Exception if the method fails.
      */
-    public static boolean verifySecretPassword(final String password, final String secretPassword) throws Exception {
+    public static boolean verifySecretPassword(final char[] password, final String secretPassword) throws Exception {
         boolean result = false;
 
         if (password == null && secretPassword == null) {
@@ -223,7 +223,7 @@ public class PasswordService {
      * @return returns {@code true} if the password are equals.
      * @throws Exception if the method fails.
      */
-    private static boolean verifyKey(final String password, final PasswordKey passwordKey) throws Exception {
+    private static boolean verifyKey(final char[] password, final PasswordKey passwordKey) throws Exception {
         byte[] tmp = createKey(password, passwordKey.getSalt(), passwordKey.getIterations());
         return Arrays.equals(tmp, passwordKey.getKey());
     }
@@ -238,8 +238,8 @@ public class PasswordService {
      * @throws NoSuchAlgorithmException if the method fails.
      * @throws InvalidKeySpecException if the method fails.
      */
-    private static byte[] createKey(final String password, byte[] salt, int iterations) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, DERIVED_KEY_LENGTH);
+    private static byte[] createKey(final char[] password, byte[] salt, int iterations) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeySpec spec = new PBEKeySpec(password, salt, iterations, DERIVED_KEY_LENGTH);
         SecretKeyFactory f = SecretKeyFactory.getInstance(ALGORITHM);
         return f.generateSecret(spec).getEncoded();
     }

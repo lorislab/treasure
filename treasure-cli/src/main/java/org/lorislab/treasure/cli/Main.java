@@ -116,7 +116,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void update(String password, String data, String newPassword) throws Exception {
-        String tmp = PasswordService.updateSecretPassword(password, newPassword, data);
+        String tmp = PasswordService.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
         console(tmp);
     }
 
@@ -128,7 +128,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void verify(String password, String data) throws Exception {
-        boolean tmp = PasswordService.verifySecretPassword(password, data);
+        boolean tmp = PasswordService.verifySecretPassword(password.toCharArray(), data);
         console("" + tmp);
     }
 
@@ -139,7 +139,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void create(String password) throws Exception {
-        String tmp = PasswordService.createSecretPassword(password);
+        String tmp = PasswordService.createSecretPassword(password.toCharArray());
         console(tmp);
     }
 

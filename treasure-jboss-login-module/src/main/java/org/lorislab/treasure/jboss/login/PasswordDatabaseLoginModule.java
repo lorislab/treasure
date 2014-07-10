@@ -42,8 +42,12 @@ public class PasswordDatabaseLoginModule extends DatabaseServerLoginModule {
     @Override
     protected boolean validatePassword(String inputPassword, String expectedPassword) {
         boolean result = false;
+        char[] tmp = null;
+        if (inputPassword != null) {
+            tmp = inputPassword.toCharArray();
+        }
         try {
-            result = PasswordService.verifySecretPassword(inputPassword, expectedPassword);
+            result = PasswordService.verifySecretPassword(tmp, expectedPassword);
         } catch (Exception ex) {
             LOGGER.log(Level.FINEST, "Verify secret password failed!", ex);
             LOGGER.log(Level.FINER, "Bad password for the username {0}", getUsername());
