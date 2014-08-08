@@ -91,8 +91,8 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void decrypt(String password, String data) throws Exception {
-        String tmp = PasswordService.decrypt(data, password.toCharArray());
-        console(tmp);
+        char[] tmp = PasswordService.decrypt(data, password.toCharArray());
+        console(new String(tmp));
     }
 
     /**
@@ -103,7 +103,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void encrypt(String password, String data) throws Exception {
-        String tmp = PasswordService.encrypt(data, password.toCharArray());
+        String tmp = PasswordService.encrypt(data.toCharArray(), password.toCharArray());
         console(tmp);
     }
 

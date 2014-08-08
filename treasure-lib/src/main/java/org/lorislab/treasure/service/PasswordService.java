@@ -15,6 +15,9 @@
  */
 package org.lorislab.treasure.service;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -80,7 +83,7 @@ public class PasswordService {
      * @return the corresponding the data.
      * @throws Exception if the method fails.
      */
-    public static String encrypt(String data, char[] password) throws Exception {
+    public static String encrypt(char[] data, char[] password) throws Exception {
 
         // create salt
         SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
@@ -99,7 +102,9 @@ public class PasswordService {
         AlgorithmParameters params = cipher.getParameters();
 
         byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-        byte[] ciphertext = cipher.doFinal(data.getBytes(CHARSET_NAME));
+
+        byte[] bytes = convertToByte(data);
+        byte[] ciphertext = cipher.doFinal(bytes);
         CipherKey key = new CipherKey(iv, ciphertext, salt, ITERATIONS);
 
         return FormatService.convertToString(key);
@@ -113,7 +118,7 @@ public class PasswordService {
      * @return the corresponding string.
      * @throws Exception if the method fails.
      */
-    public static String decrypt(String data, char[] password) throws Exception {
+    public static char[] decrypt(String data, char[] password) throws Exception {
         CipherKey key = FormatService.convertToCipherKey(data);
 
         SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
@@ -123,7 +128,9 @@ public class PasswordService {
 
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(key.getIv()));
-        return new String(cipher.doFinal(key.getCipherText()), CHARSET_NAME);
+
+        byte[] bytes = cipher.doFinal(key.getCipherText());
+        return convertToChar(bytes);
     }
 
     /**
@@ -244,4 +251,33 @@ public class PasswordService {
         return f.generateSecret(spec).getEncoded();
     }
 
+    /**
+     * Converts the array of characters to array of byte.
+     *
+     * @param data the array of characters.
+     * @return the corresponding array of the bytes.
+     */
+    private static byte[] convertToByte(char[] data) {
+        CharBuffer charBuffer = CharBuffer.wrap(data);
+        ByteBuffer byteBuffer = Charset.forName(CHARSET_NAME).encode(charBuffer);
+        byte[] result = Arrays.copyOfRange(byteBuffer.array(), byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\u0000');
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return result;
+    }
+
+    /**
+     * Converts the array of bytes to array of characters.
+     *
+     * @param data the array of bytes.
+     * @return the corresponding array of the characters.
+     */
+    private static char[] convertToChar(byte[] data) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+        CharBuffer charBuffer = Charset.forName(CHARSET_NAME).decode(byteBuffer);
+        char[] result = Arrays.copyOfRange(charBuffer.array(), charBuffer.position(), charBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\u0000');
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return result;
+    }
 }
