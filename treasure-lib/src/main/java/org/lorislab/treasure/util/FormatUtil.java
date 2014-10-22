@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.treasure.service;
+package org.lorislab.treasure.util;
 
+import org.lorislab.treasure.util.ConverterUtil;
 import org.lorislab.treasure.model.CipherKey;
 import org.lorislab.treasure.model.PasswordKey;
 
@@ -23,12 +24,12 @@ import org.lorislab.treasure.model.PasswordKey;
  *
  * @author Andrej Petras
  */
-public final class FormatService {
+public final class FormatUtil {
 
     /**
      * The default constructor.
      */
-    private FormatService() {
+    private FormatUtil() {
         //  empty constructor.
     }
 
@@ -47,9 +48,9 @@ public final class FormatService {
         StringBuilder sb = new StringBuilder();
         sb.append(passwordKey.getIterations());        
         sb.append(SEPARATOR);
-        sb.append(ConverterService.bytesToHexString(passwordKey.getSalt()));
+        sb.append(ConverterUtil.bytesToHexString(passwordKey.getSalt()));
         sb.append(SEPARATOR);
-        sb.append(ConverterService.bytesToHexString(passwordKey.getKey()));
+        sb.append(ConverterUtil.bytesToHexString(passwordKey.getKey()));
         return sb.toString();
     }
 
@@ -62,8 +63,8 @@ public final class FormatService {
     public static PasswordKey convertToPasswordKey(final String secretPassword) {
         String[] tmp = secretPassword.split(SEPARATOR);
         int iterations = Integer.parseInt(tmp[0]);
-        byte[] salt = ConverterService.hexStringToBytes(tmp[1]);        
-        byte[] key = ConverterService.hexStringToBytes(tmp[2]);
+        byte[] salt = ConverterUtil.hexStringToBytes(tmp[1]);        
+        byte[] key = ConverterUtil.hexStringToBytes(tmp[2]);
         return new PasswordKey(iterations, salt, key);
     }
 
@@ -76,9 +77,9 @@ public final class FormatService {
     public static CipherKey convertToCipherKey(String hash) {
         String[] tmp = hash.split(SEPARATOR);
         int iterations = Integer.parseInt(tmp[0]);
-        byte[] iv = ConverterService.hexStringToBytes(tmp[1]);
-        byte[] salt = ConverterService.hexStringToBytes(tmp[2]);
-        byte[] cipherText = ConverterService.hexStringToBytes(tmp[3]);
+        byte[] iv = ConverterUtil.hexStringToBytes(tmp[1]);
+        byte[] salt = ConverterUtil.hexStringToBytes(tmp[2]);
+        byte[] cipherText = ConverterUtil.hexStringToBytes(tmp[3]);
         return new CipherKey(iv, cipherText, salt, iterations);
     }
 
@@ -92,11 +93,11 @@ public final class FormatService {
         StringBuilder sb = new StringBuilder();
         sb.append(key.getIterations());
         sb.append(SEPARATOR);
-        sb.append(ConverterService.bytesToHexString(key.getIv()));
+        sb.append(ConverterUtil.bytesToHexString(key.getIv()));
         sb.append(SEPARATOR);
-        sb.append(ConverterService.bytesToHexString(key.getSalt()));
+        sb.append(ConverterUtil.bytesToHexString(key.getSalt()));
         sb.append(SEPARATOR);
-        sb.append(ConverterService.bytesToHexString(key.getCipherText()));
+        sb.append(ConverterUtil.bytesToHexString(key.getCipherText()));
         return sb.toString();
     }
 }

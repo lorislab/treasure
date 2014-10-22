@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.treasure.service;
+package org.lorislab.treasure.util;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -38,7 +38,7 @@ import org.lorislab.treasure.model.PasswordKey;
  *
  * @author Andrej Petras
  */
-public class PasswordService {
+public class PasswordUtil {
 
     /**
      * The main algorithm for the secret password.
@@ -84,7 +84,11 @@ public class PasswordService {
      * @throws Exception if the method fails.
      */
     public static String encrypt(char[] data, char[] password) throws Exception {
-
+        // check the data
+        if (data == null) {
+            return null;
+        }
+        
         // create salt
         SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
         byte[] salt = new byte[8];
@@ -107,7 +111,7 @@ public class PasswordService {
         byte[] ciphertext = cipher.doFinal(bytes);
         CipherKey key = new CipherKey(iv, ciphertext, salt, ITERATIONS);
 
-        return FormatService.convertToString(key);
+        return FormatUtil.convertToString(key);
     }
 
     /**
@@ -119,7 +123,12 @@ public class PasswordService {
      * @throws Exception if the method fails.
      */
     public static char[] decrypt(String data, char[] password) throws Exception {
-        CipherKey key = FormatService.convertToCipherKey(data);
+        // check the data
+        if (data == null) {
+            return null;
+        }
+        
+        CipherKey key = FormatUtil.convertToCipherKey(data);
 
         SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
         KeySpec spec = new PBEKeySpec(password, key.getSalt(), key.getIterations(), DERIVED_KEY_LENGTH);
@@ -154,7 +163,7 @@ public class PasswordService {
                 byte[] data = createKey(password, salt, ITERATIONS);
                 PasswordKey tmp = new PasswordKey(ITERATIONS, salt, data);
 
-                return FormatService.convertToString(tmp);
+                return FormatUtil.convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error create secret password.", ex);
             }
@@ -178,7 +187,7 @@ public class PasswordService {
         if (password == null && secretPassword == null) {
             result = createSecretPassword(newPassword);
         } else {
-            PasswordKey pk = FormatService.convertToPasswordKey(secretPassword);
+            PasswordKey pk = FormatUtil.convertToPasswordKey(secretPassword);
             boolean valid = verifyKey(password, pk);
 
             if (!valid) {
@@ -188,7 +197,7 @@ public class PasswordService {
             try {
                 byte[] key = createKey(newPassword, pk.getSalt(), pk.getIterations());
                 PasswordKey tmp = new PasswordKey(pk.getIterations(), pk.getSalt(), key);
-                result = FormatService.convertToString(tmp);
+                result = FormatUtil.convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error update secret password", ex);
             }
@@ -212,7 +221,7 @@ public class PasswordService {
             result = true;
         } else {
             try {
-                PasswordKey tmp = FormatService.convertToPasswordKey(secretPassword);
+                PasswordKey tmp = FormatUtil.convertToPasswordKey(secretPassword);
                 result = verifyKey(password, tmp);
             } catch (Exception ex) {
                 throw new Exception("Error vefiry the secret password", ex);

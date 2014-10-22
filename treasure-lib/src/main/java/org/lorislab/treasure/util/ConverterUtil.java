@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lorislab.treasure.service;
+package org.lorislab.treasure.util;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -23,12 +23,12 @@ import javax.xml.bind.DatatypeConverter;
  * 
  * @author Andrej Petras
  */
-public final class ConverterService {
+public final class ConverterUtil {
 
     /**
      * The default constructor.
      */
-    private ConverterService() {
+    private ConverterUtil() {
         //  empty constructor.
     }
     

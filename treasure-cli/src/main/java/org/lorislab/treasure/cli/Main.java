@@ -18,7 +18,7 @@ package org.lorislab.treasure.cli;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import org.lorislab.treasure.service.PasswordService;
+import org.lorislab.treasure.util.PasswordUtil;
 
 /**
  * The main class.
@@ -91,7 +91,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void decrypt(String password, String data) throws Exception {
-        char[] tmp = PasswordService.decrypt(data, password.toCharArray());
+        char[] tmp = PasswordUtil.decrypt(data, password.toCharArray());
         console(new String(tmp));
     }
 
@@ -103,7 +103,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void encrypt(String password, String data) throws Exception {
-        String tmp = PasswordService.encrypt(data.toCharArray(), password.toCharArray());
+        String tmp = PasswordUtil.encrypt(data.toCharArray(), password.toCharArray());
         console(tmp);
     }
 
@@ -116,7 +116,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void update(String password, String data, String newPassword) throws Exception {
-        String tmp = PasswordService.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
+        String tmp = PasswordUtil.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
         console(tmp);
     }
 
@@ -128,7 +128,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void verify(String password, String data) throws Exception {
-        boolean tmp = PasswordService.verifySecretPassword(password.toCharArray(), data);
+        boolean tmp = PasswordUtil.verifySecretPassword(password.toCharArray(), data);
         console("" + tmp);
     }
 
@@ -139,7 +139,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void create(String password) throws Exception {
-        String tmp = PasswordService.createSecretPassword(password.toCharArray());
+        String tmp = PasswordUtil.createSecretPassword(password.toCharArray());
         console(tmp);
     }
 

@@ -18,7 +18,7 @@ package org.lorislab.treasure.jboss.login;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jboss.security.auth.spi.DatabaseServerLoginModule;
-import org.lorislab.treasure.service.PasswordService;
+import org.lorislab.treasure.util.PasswordUtil;
 
 /**
  * The database login module.
@@ -47,7 +47,7 @@ public class PasswordDatabaseLoginModule extends DatabaseServerLoginModule {
             tmp = inputPassword.toCharArray();
         }
         try {
-            result = PasswordService.verifySecretPassword(tmp, expectedPassword);
+            result = PasswordUtil.verifySecretPassword(tmp, expectedPassword);
         } catch (Exception ex) {
             LOGGER.log(Level.FINEST, "Verify secret password failed!", ex);
             LOGGER.log(Level.FINER, "Bad password for the username {0}", getUsername());
