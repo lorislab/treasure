@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.treasure.cli;
+package org.lorislab.treasure;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import org.lorislab.treasure.util.PasswordUtil;
 
 /**
  * The main class.
  *
  * @author Andrej Petras
  */
-public class Main {
+public class TreasureMain {
 
     /**
      * The MAVEN properties path.
@@ -91,7 +90,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void decrypt(String password, String data) throws Exception {
-        char[] tmp = PasswordUtil.decrypt(data, password.toCharArray());
+        char[] tmp = Treasure.decrypt(data, password.toCharArray());
         console(new String(tmp));
     }
 
@@ -103,7 +102,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void encrypt(String password, String data) throws Exception {
-        String tmp = PasswordUtil.encrypt(data.toCharArray(), password.toCharArray());
+        String tmp = Treasure.encrypt(data.toCharArray(), password.toCharArray());
         console(tmp);
     }
 
@@ -116,7 +115,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void update(String password, String data, String newPassword) throws Exception {
-        String tmp = PasswordUtil.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
+        String tmp = Treasure.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
         console(tmp);
     }
 
@@ -128,7 +127,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void verify(String password, String data) throws Exception {
-        boolean tmp = PasswordUtil.verifySecretPassword(password.toCharArray(), data);
+        boolean tmp = Treasure.verifySecretPassword(password.toCharArray(), data);
         console("" + tmp);
     }
 
@@ -139,7 +138,7 @@ public class Main {
      * @throws Exception if the method fails.
      */
     private static void create(String password) throws Exception {
-        String tmp = PasswordUtil.createSecretPassword(password.toCharArray());
+        String tmp = Treasure.createSecretPassword(password.toCharArray());
         console(tmp);
     }
 
@@ -149,7 +148,7 @@ public class Main {
     private static void version() {
         Properties properties = new Properties();
         try {
-            try (InputStream in = Main.class.getResourceAsStream(MAVEN_PROPS)) {
+            try (InputStream in = TreasureMain.class.getResourceAsStream(MAVEN_PROPS)) {
                 properties.load(in);
             }
         } catch (IOException ex) {

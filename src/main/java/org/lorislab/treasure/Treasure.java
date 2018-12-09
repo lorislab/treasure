@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.treasure.util;
+package org.lorislab.treasure;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -30,15 +30,14 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.lorislab.treasure.model.CipherKey;
-import org.lorislab.treasure.model.PasswordKey;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * The password key service.
  *
  * @author Andrej Petras
  */
-public class PasswordUtil {
+public class Treasure {
 
     /**
      * The main algorithm for the secret password.
@@ -74,7 +73,12 @@ public class PasswordUtil {
      * The char set name.
      */
     private static final String CHARSET_NAME = "UTF-8";
-
+    
+    /**
+     * The secret password separator.
+     */
+    private static final String SEPARATOR = ":";
+    
     /**
      * Encrypts the data with the password.
      *
@@ -111,7 +115,7 @@ public class PasswordUtil {
         byte[] ciphertext = cipher.doFinal(bytes);
         CipherKey key = new CipherKey(iv, ciphertext, salt, ITERATIONS);
 
-        return FormatUtil.convertToString(key);
+        return convertToString(key);
     }
 
     /**
@@ -128,7 +132,7 @@ public class PasswordUtil {
             return null;
         }
         
-        CipherKey key = FormatUtil.convertToCipherKey(data);
+        CipherKey key = convertToCipherKey(data);
 
         SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
         KeySpec spec = new PBEKeySpec(password, key.getSalt(), key.getIterations(), DERIVED_KEY_LENGTH);
@@ -163,7 +167,7 @@ public class PasswordUtil {
                 byte[] data = createKey(password, salt, ITERATIONS);
                 PasswordKey tmp = new PasswordKey(ITERATIONS, salt, data);
 
-                return FormatUtil.convertToString(tmp);
+                return convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error create secret password.", ex);
             }
@@ -187,7 +191,7 @@ public class PasswordUtil {
         if (password == null && secretPassword == null) {
             result = createSecretPassword(newPassword);
         } else {
-            PasswordKey pk = FormatUtil.convertToPasswordKey(secretPassword);
+            PasswordKey pk = convertToPasswordKey(secretPassword);
             boolean valid = verifyKey(password, pk);
 
             if (!valid) {
@@ -197,7 +201,7 @@ public class PasswordUtil {
             try {
                 byte[] key = createKey(newPassword, pk.getSalt(), pk.getIterations());
                 PasswordKey tmp = new PasswordKey(pk.getIterations(), pk.getSalt(), key);
-                result = FormatUtil.convertToString(tmp);
+                result = convertToString(tmp);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                 throw new Exception("Error update secret password", ex);
             }
@@ -221,7 +225,7 @@ public class PasswordUtil {
             result = true;
         } else {
             try {
-                PasswordKey tmp = FormatUtil.convertToPasswordKey(secretPassword);
+                PasswordKey tmp = convertToPasswordKey(secretPassword);
                 result = verifyKey(password, tmp);
             } catch (Exception ex) {
                 throw new Exception("Error vefiry the secret password", ex);
@@ -289,4 +293,87 @@ public class PasswordUtil {
         Arrays.fill(byteBuffer.array(), (byte) 0);
         return result;
     }
+
+    /**
+     * Converts the password key to secret password.
+     *
+     * @param passwordKey the password key.
+     * @return the secret password.
+     */
+    private static String convertToString(final PasswordKey passwordKey) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(passwordKey.getIterations());        
+        sb.append(SEPARATOR);
+        sb.append(bytesToHexString(passwordKey.getSalt()));
+        sb.append(SEPARATOR);
+        sb.append(bytesToHexString(passwordKey.getKey()));
+        return sb.toString();
+    }
+
+    /**
+     * Converts the secret password to the password key.
+     *
+     * @param secretPassword the secret password.
+     * @return the password key.
+     */
+    private static PasswordKey convertToPasswordKey(final String secretPassword) {
+        String[] tmp = secretPassword.split(SEPARATOR);
+        int iterations = Integer.parseInt(tmp[0]);
+        byte[] salt = hexStringToBytes(tmp[1]);        
+        byte[] key = hexStringToBytes(tmp[2]);
+        return new PasswordKey(iterations, salt, key);
+    }
+
+    /**
+     * Converts the hash to the cipher key.
+     *
+     * @param hash the hash string.
+     * @return the corresponding cipher key.
+     */
+    private static CipherKey convertToCipherKey(String hash) {
+        String[] tmp = hash.split(SEPARATOR);
+        int iterations = Integer.parseInt(tmp[0]);
+        byte[] iv = hexStringToBytes(tmp[1]);
+        byte[] salt = hexStringToBytes(tmp[2]);
+        byte[] cipherText = hexStringToBytes(tmp[3]);
+        return new CipherKey(iv, cipherText, salt, iterations);
+    }
+
+    /**
+     * Converts the cipher key to the hash string.
+     *
+     * @param key the cipher key.
+     * @return the corresponding the hash key.
+     */
+    private static String convertToString(final CipherKey key) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(key.getIterations());
+        sb.append(SEPARATOR);
+        sb.append(bytesToHexString(key.getIv()));
+        sb.append(SEPARATOR);
+        sb.append(bytesToHexString(key.getSalt()));
+        sb.append(SEPARATOR);
+        sb.append(bytesToHexString(key.getCipherText()));
+        return sb.toString();
+    }
+    
+    /**
+     * Converts an array of bytes into a string.
+     *
+     * @param array the array of bytes.
+     * @return the string.
+     */
+    private static String bytesToHexString(byte[] array) {
+        return DatatypeConverter.printHexBinary(array);
+    }
+
+    /**
+     * Converts the string argument into an array of bytes.
+     *
+     * @param s the string.
+     * @return the array of bytes.
+     */
+    private static byte[] hexStringToBytes(String s) {
+        return DatatypeConverter.parseHexBinary(s);
+    }    
 }
