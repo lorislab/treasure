@@ -15,8 +15,8 @@
  */
 package org.lorislab.treasure;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Properties;
 
 /**
@@ -27,21 +27,16 @@ import java.util.Properties;
 public class TreasureMain {
 
     /**
-     * The MAVEN properties path.
+     * The system output.
      */
-    private static final String MAVEN_PROPS = "/META-INF/maven/org.lorislab.treasure/treasure-cli/pom.properties";
-
-    /**
-     * The MAVEN version key.
-     */
-    private static final String MAVEN_KEY = "version";
+    private static final PrintStream CONSOLE = System.out;
 
     /**
      * The main method.
      *
      * @param args the list of arguments.
      */
-    public static final void main(String... args) {
+    public static void main(String... args) {
 
         if (args == null || args.length == 0) {
             help();
@@ -51,124 +46,58 @@ public class TreasureMain {
                 switch (cmd) {
                     case "--create":
                         check(args, 2);
-                        create(args[1]);
+                        String tmp = Treasure.createSecretPassword(args[1].toCharArray());
+                        CONSOLE.println(tmp);
                         break;
                     case "--verify":
                         check(args, 3);
-                        verify(args[1], args[2]);
+                        boolean verify = Treasure.verifySecretPassword(args[1].toCharArray(), args[2]);
+                        CONSOLE.println("" + verify);
                         break;
                     case "--update":
                         check(args, 4);
-                        update(args[1], args[2], args[3]);
+                        String update = Treasure.updateSecretPassword(args[1].toCharArray(), args[3].toCharArray(), args[2]);
+                        CONSOLE.println(update);
                         break;
                     case "--encrypt":
                         check(args, 3);
-                        encrypt(args[1], args[2]);
+                        String encrypt = Treasure.encrypt(args[1].toCharArray(), args[2].toCharArray());
+                        CONSOLE.println(encrypt);
                         break;
                     case "--decrypt":
                         check(args, 3);
-                        decrypt(args[1], args[2]);
+                        char[] decrypt = Treasure.decrypt(args[1], args[2].toCharArray());
+                        CONSOLE.println(new String(decrypt));
                         break;
                     case "--version":
-                        version();
+                        Properties properties = new Properties();
+                        try (InputStream in = TreasureMain.class.getResourceAsStream("/META-INF/maven/org.lorislab.treasure/treasure/pom.properties")) {
+                            properties.load(in);
+                        }
+                        CONSOLE.println("Version: " + properties.getProperty("version"));
                         break;
                     case "--help":
                         help();
                         break;
                 }
             } catch (Exception ex) {
-                error("Error execute the command " + cmd, ex);
+                System.err.println("Error execute the command Error: " + ex.getMessage());
             }
         }
-    }
-
-    /**
-     * Decrypts the data with password.
-     *
-     * @param password the password.
-     * @param data the hash data.
-     * @throws Exception if the method fails.
-     */
-    private static void decrypt(String password, String data) throws Exception {
-        char[] tmp = Treasure.decrypt(data, password.toCharArray());
-        console(new String(tmp));
-    }
-
-    /**
-     * Encrypts the data with password.
-     *
-     * @param password the password.
-     * @param data the data.
-     * @throws Exception if the method fails.
-     */
-    private static void encrypt(String password, String data) throws Exception {
-        String tmp = Treasure.encrypt(data.toCharArray(), password.toCharArray());
-        console(tmp);
-    }
-
-    /**
-     * Updates the password.
-     *
-     * @param password the old password.
-     * @param data the hash data.
-     * @param newPassword the new password.
-     * @throws Exception if the method fails.
-     */
-    private static void update(String password, String data, String newPassword) throws Exception {
-        String tmp = Treasure.updateSecretPassword(password.toCharArray(), newPassword.toCharArray(), data);
-        console(tmp);
-    }
-
-    /**
-     * Verify the password.
-     *
-     * @param password the password.
-     * @param data the hash data.
-     * @throws Exception if the method fails.
-     */
-    private static void verify(String password, String data) throws Exception {
-        boolean tmp = Treasure.verifySecretPassword(password.toCharArray(), data);
-        console("" + tmp);
-    }
-
-    /**
-     * Creates the password hash.
-     *
-     * @param password the password.
-     * @throws Exception if the method fails.
-     */
-    private static void create(String password) throws Exception {
-        String tmp = Treasure.createSecretPassword(password.toCharArray());
-        console(tmp);
-    }
-
-    /**
-     * Print out the version.
-     */
-    private static void version() {
-        Properties properties = new Properties();
-        try {
-            try (InputStream in = TreasureMain.class.getResourceAsStream(MAVEN_PROPS)) {
-                properties.load(in);
-            }
-        } catch (IOException ex) {
-            // do nothing
-        }
-        console("Version: " + properties.getProperty(MAVEN_KEY));
     }
 
     /**
      * Print out the help.
      */
     private static void help() {
-        console("Usage: treasure-cli <command> <values>");
-        console("--create  <password>");
-        console("--verify  <password> <hash>");
-        console("--update  <password> <newPassword> <hash>");
-        console("--encrypt <password> <data>");
-        console("--decrypt <password> <hash>");
-        console("--version");
-        console("--help");
+        CONSOLE.println("Usage: treasure-cli <command> <values>");
+        CONSOLE.println("--create  <password>");
+        CONSOLE.println("--verify  <password> <hash>");
+        CONSOLE.println("--update  <password> <newPassword> <hash>");
+        CONSOLE.println("--encrypt <password> <data>");
+        CONSOLE.println("--decrypt <password> <hash>");
+        CONSOLE.println("--version");
+        CONSOLE.println("--help");
     }
 
     /**
@@ -184,22 +113,4 @@ public class TreasureMain {
         }
     }
 
-    /**
-     * Print out the error.
-     *
-     * @param message the message.
-     * @param ex the exception.
-     */
-    private static void error(String message, Throwable ex) {
-        System.err.println(message + " Error: " + ex.getMessage());
-    }
-
-    /**
-     * Print out the value in to the console.
-     *
-     * @param value the value.
-     */
-    private static void console(String value) {
-        System.out.println(value);
-    }
 }

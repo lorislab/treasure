@@ -15,12 +15,17 @@
  */
 package org.lorislab.treasure;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * The password key.
  *
  * @author Andrej Petras
  */
-public class PasswordKey {
+@Data
+@AllArgsConstructor
+class PasswordKey {
 
     /**
      * The iterations.
@@ -37,43 +42,4 @@ public class PasswordKey {
      */
     private final byte[] key;
 
-    /**
-     * Creates the password key.
-     *
-     * @param iterations the iterations.
-     * @param salt the salt.
-     * @param key the key.
-     */
-    public PasswordKey(int iterations, byte[] salt, byte[] key) {
-        this.iterations = iterations;
-        this.salt = salt;
-        this.key = key;
-    }
-
-    /**
-     * Gets the iterations.
-     *
-     * @return the iterations.
-     */
-    public int getIterations() {
-        return iterations;
-    }
-
-    /**
-     * Gets the salt.
-     *
-     * @return the salt.
-     */
-    public byte[] getSalt() {
-        return salt;
-    }
-
-    /**
-     * Gets the key.
-     *
-     * @return the key.
-     */
-    public byte[] getKey() {
-        return key;
-    }
 }

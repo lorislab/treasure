@@ -15,12 +15,17 @@
  */
 package org.lorislab.treasure;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * The cipher key.
  *
  * @author Andrej Petras
  */
-public class CipherKey {
+@Data
+@AllArgsConstructor
+class CipherKey {
 
     /**
      * The iv.
@@ -41,56 +46,5 @@ public class CipherKey {
      * The iterations.
      */
     private final int iterations;
-    
-    /**
-     * The default constructor.
-     *
-     * @param iv the iv.
-     * @param cipherText the cipher text.
-     * @param salt the salt.
-     * @param iterations the iterations.
-     */
-    public CipherKey(byte[] iv, byte[] cipherText, byte[] salt, int iterations) {
-        this.iv = iv;
-        this.cipherText = cipherText;
-        this.salt = salt;
-        this.iterations = iterations;
-    }
-
-    /**
-     * Gets the iterations.
-     *
-     * @return the iterations.
-     */
-    public int getIterations() {
-        return iterations;
-    }
-    
-    /**
-     * Gets the iv.
-     *
-     * @return the iv.
-     */
-    public byte[] getIv() {
-        return iv;
-    }
-
-    /**
-     * The cipher text.
-     *
-     * @return the cipher text.
-     */
-    public byte[] getCipherText() {
-        return cipherText;
-    }
-
-    /**
-     * Gets the salt.
-     *
-     * @return the salt.
-     */
-    public byte[] getSalt() {
-        return salt;
-    }
 
 }
