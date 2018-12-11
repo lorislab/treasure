@@ -8,5 +8,5 @@ cache:
 before_install:
   - git clone https://github.com/lorislab/travis-configuration.git .scripts
 
-install: .scripts/maven/install.sh
-script: .scripts/maven/build.sh
+install: ./.scripts/maven/install.sh
+script: ./.scripts/maven/build.sh
