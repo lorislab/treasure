@@ -126,7 +126,7 @@
         <snapshotRepository>
             <id>bintray</id>
             <name>Snapshot</name>
-            <url>https://api.bintray.com/maven/lorislab/maven/treasure/;publish=1</url>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
 
