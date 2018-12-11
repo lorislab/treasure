@@ -7,6 +7,7 @@ cache:
 
 before_install:
   - git clone https://github.com/lorislab/travis-configuration.git .scripts
+  - find .scripts -type f -iname "*.sh" -exec chmod +x {} \;
 
 install: ./.scripts/maven/install.sh
 script: ./.scripts/maven/build.sh
