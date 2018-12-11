@@ -120,8 +120,14 @@
     <distributionManagement>
         <repository>
             <id>bintray</id>
+            <name>Release</name>
             <url>https://api.bintray.com/maven/lorislab/maven/treasure/;publish=1</url>
         </repository>
+        <snapshotRepository>
+            <id>bintray</id>
+            <name>Snapshot</name>
+            <url>https://api.bintray.com/maven/lorislab/maven/treasure/;publish=1</url>
+        </snapshotRepository>
     </distributionManagement>
 
 </project>
