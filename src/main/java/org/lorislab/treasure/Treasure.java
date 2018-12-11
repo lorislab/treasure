@@ -186,6 +186,7 @@ public class Treasure {
      * @return the corresponding secret password.
      * @throws RuntimeException if the method fails.
      */
+    @SuppressWarnings("WeakerAccess")
     public static String createSecretPassword(final char[] password, int iterations) {
         if (password != null) {
             try {
@@ -248,6 +249,7 @@ public class Treasure {
      * @return returns {@code true} if the password are equals.
      * @throws RuntimeException if the method fails.
      */
+    @SuppressWarnings("WeakerAccess")
     public static boolean verifySecretPassword(final char[] password, final String secretPassword) {
         boolean result;
 
