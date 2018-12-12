@@ -1,5 +1,13 @@
 language: java
 jdk:
-  - oraclejdk7
-install: mvn install -DskipTests=true -q
-script: mvn test
+  - oraclejdk8
+cache:
+  directories:
+    - $HOME/.m2
+
+before_install:
+  - git clone https://github.com/lorislab/travis-configuration.git .scripts
+  - find .scripts -type f -iname "*.sh" -exec chmod +x {} \;
+
+install: ./.scripts/maven/install.sh
+script: ./.scripts/maven/build.sh

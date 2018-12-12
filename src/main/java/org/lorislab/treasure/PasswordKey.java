@@ -13,19 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.treasure.api.service;
+package org.lorislab.treasure;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
- * The secret key service.
+ * The password key.
  *
  * @author Andrej Petras
  */
-public interface SecretKeyService {
+@Data
+@AllArgsConstructor
+class PasswordKey {
 
     /**
-     * Gets the secret key.
-     *
-     * @return the secret key.
+     * The iterations.
      */
-    public char[] getSecretKey();
+    private final int iterations;
+
+    /**
+     * The salt.
+     */
+    private final byte[] salt;
+
+    /**
+     * The key.
+     */
+    private final byte[] key;
+
 }
